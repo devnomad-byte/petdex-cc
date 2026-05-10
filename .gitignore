@@ -6,3 +6,11 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+
+# Dev/planning files
+.agents/
+.claude/
+.junie/
+docs/
+openspec/
+skills-lock.json
