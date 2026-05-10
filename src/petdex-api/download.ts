@@ -15,36 +15,55 @@ function resolveExtension(url: string): string {
   return ".webp";
 }
 
+export type ProgressCallback = (info: {
+  phase: string;
+  bytesDone: number;
+  bytesTotal: number;
+}) => void;
+
+async function downloadWithProgress(
+  url: string,
+  destPath: string,
+  phase: string,
+  onProgress?: ProgressCallback,
+): Promise<void> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
+  }
+
+  const total = parseInt(response.headers.get("content-length") || "0", 10);
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("No response body");
+
+  const chunks: Uint8Array[] = [];
+  let done = 0;
+
+  for (;;) {
+    const { value, done: ended } = await reader.read();
+    if (ended) break;
+    chunks.push(value);
+    done += value.length;
+    if (onProgress) onProgress({ phase, bytesDone: done, bytesTotal: total || done });
+  }
+
+  const buffer = Buffer.concat(chunks);
+  fs.writeFileSync(destPath, buffer);
+}
+
 export async function downloadPetAssets(
-  pet: PetManifestEntry
+  pet: PetManifestEntry,
+  onProgress?: ProgressCallback,
 ): Promise<{ spritesheetPath: string; petJsonPath: string }> {
   const petDir = getPetDir(pet.slug);
-
   fs.mkdirSync(petDir, { recursive: true });
 
   const spritesheetExt = resolveExtension(pet.spritesheetUrl);
   const spritesheetPath = path.join(petDir, `spritesheet${spritesheetExt}`);
   const petJsonPath = path.join(petDir, "pet.json");
 
-  // Download spritesheet
-  const spritesheetResponse = await fetch(pet.spritesheetUrl);
-  if (!spritesheetResponse.ok) {
-    throw new Error(
-      `Failed to download spritesheet for ${pet.slug}: ${spritesheetResponse.status} ${spritesheetResponse.statusText}`
-    );
-  }
-  const spritesheetBuffer = Buffer.from(await spritesheetResponse.arrayBuffer());
-  fs.writeFileSync(spritesheetPath, spritesheetBuffer);
-
-  // Download pet.json
-  const petJsonResponse = await fetch(pet.petJsonUrl);
-  if (!petJsonResponse.ok) {
-    throw new Error(
-      `Failed to download pet.json for ${pet.slug}: ${petJsonResponse.status} ${petJsonResponse.statusText}`
-    );
-  }
-  const petJsonBuffer = Buffer.from(await petJsonResponse.arrayBuffer());
-  fs.writeFileSync(petJsonPath, petJsonBuffer);
+  await downloadWithProgress(pet.spritesheetUrl, spritesheetPath, "spritesheet", onProgress);
+  await downloadWithProgress(pet.petJsonUrl, petJsonPath, "metadata", onProgress);
 
   return { spritesheetPath, petJsonPath };
 }
