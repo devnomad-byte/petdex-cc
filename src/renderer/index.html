@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- CSP removed for local Electron renderer -->
+  <title>petdex-cc</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #pet-container {
+      position: absolute;
+      width: 300px;
+      height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    #bubble-container {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 4px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #bubble {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      max-width: 220px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      font: 13px sans-serif;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      opacity: 1;
+      transition: opacity 200ms ease-in, opacity 500ms ease-out;
+      pointer-events: none;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+
+    #bubble.bubble-hidden {
+      opacity: 0;
+    }
+
+    #bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid rgba(255, 255, 255, 0.9);
+    }
+
+    #pet-sprite {
+      width: 192px;
+      height: 208px;
+      position: relative;
+      background-repeat: no-repeat;
+      background-size: 1536px 1872px;
+      image-rendering: pixelated;
+      background-image: var(--sprite-url);
+      animation: pet-state var(--sprite-duration) steps(var(--sprite-frames)) infinite;
+      --sprite-url: none;
+      --sprite-row: 0;
+      --sprite-frames: 6;
+      --sprite-duration: 1100ms;
+      --sprite-y: calc(var(--sprite-row) * -208px);
+      --sprite-end-x: calc(var(--sprite-frames) * -192px);
+    }
+
+    @keyframes pet-state {
+      from {
+        background-position: 0 var(--sprite-y);
+      }
+      to {
+        background-position: var(--sprite-end-x) var(--sprite-y);
+      }
+    }
+
+    /* ── Level badge ── */
+    #level-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font: 600 10px/1.4 'Cascadia Code', 'SF Mono', 'Fira Code', Consolas, monospace;
+      letter-spacing: 0.4px;
+      pointer-events: none;
+      z-index: 20;
+      white-space: nowrap;
+      display: none;
+      text-shadow: 0 0 8px var(--lv-color, #fff), 0 1px 2px rgba(0,0,0,0.5);
+      box-shadow: 0 0 8px -2px var(--lv-color, transparent),
+                  0 2px 4px rgba(0,0,0,0.2),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+
+    #level-badge::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -60%;
+      width: 40%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: skewX(-25deg);
+      animation: badge-shine 5s ease-in-out infinite;
+    }
+
+    @keyframes badge-shine {
+      0%, 75%, 100% { left: -60%; }
+      90% { left: 140%; }
+    }
+
+    /* ── Level effect layers ── */
+    #level-glow, #level-aura, #level-halo {
+      position: absolute;
+      top: -16px; left: -16px;
+      width: 224px; height: 240px;
+      pointer-events: none;
+    }
+
+    #level-particles {
+      position: absolute;
+      top: 0; left: 0;
+      width: 192px; height: 208px;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    /* Glow — soft breathing radial */
+    #level-glow {
+      border-radius: 50%;
+      filter: blur(18px);
+      opacity: 0;
+    }
+
+    #level-glow.active {
+      background: radial-gradient(circle, var(--lv-color, #4ade80) 0%, transparent 60%);
+      animation: glow-breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes glow-breathe {
+      0%, 100% { opacity: 0.1; transform: scale(0.9); }
+      50%      { opacity: 0.3; transform: scale(1.08); }
+    }
+
+    /* Aura — rotating conic-gradient ring */
+    #level-aura {
+      border-radius: 50%;
+      opacity: 0;
+    }
+
+    #level-aura.active {
+      background: conic-gradient(
+        from 0deg,
+        transparent 0%, var(--lv-color, #60a5fa) 6%, transparent 14%,
+        transparent 44%, var(--lv-color, #60a5fa) 50%, transparent 58%,
+        transparent 100%
+      );
+      -webkit-mask: radial-gradient(circle, transparent 58%, black 60%, black 78%, transparent 80%);
+              mask: radial-gradient(circle, transparent 58%, black 60%, black 78%, transparent 80%);
+      animation: aura-spin 10s linear infinite, aura-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes aura-spin  { to { transform: rotate(360deg); } }
+    @keyframes aura-pulse {
+      0%, 100% { opacity: 0.45; }
+      50%      { opacity: 0.85; }
+    }
+
+    /* Particles — floating light motes */
+    .level-particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--lv-color, #f59e0b);
+      box-shadow: 0 0 6px 1px var(--lv-color, #f59e0b);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .level-particle.active {
+      animation: p-float var(--p-dur, 3s) ease-out infinite var(--p-del, 0s);
+    }
+
+    @keyframes p-float {
+      0%   { opacity: 0; transform: translateY(0) scale(0.4); }
+      10%  { opacity: 0.9; transform: translateY(-5px) scale(1); }
+      100% { opacity: 0; transform: translateY(var(--p-dy, -80px)) translateX(var(--p-dx, 0px)) scale(0.2); }
+    }
+
+    /* Halo — golden shimmer ring */
+    #level-halo {
+      border-radius: 50%;
+      border: 2px solid transparent;
+      opacity: 0;
+    }
+
+    #level-halo.active {
+      border-color: #fbbf24;
+      animation: halo-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes halo-glow {
+      0%, 100% { opacity: 0.45; box-shadow: 0 0 10px #fbbf2444, inset 0 0 6px #fbbf2422; }
+      50%      { opacity: 0.85; box-shadow: 0 0 24px #fbbf2488, inset 0 0 12px #fbbf2444, 0 0 40px #fbbf2422; }
+    }
+  </style>
+</head>
+<body>
+  <div id="pet-container">
+    <div id="bubble-container">
+      <div id="bubble" class="bubble-hidden"></div>
+    </div>
+    <div id="pet-sprite-wrapper" style="position: relative;">
+      <div id="pet-sprite"></div>
+      <div id="level-glow"></div>
+      <div id="level-aura"></div>
+      <div id="level-particles">
+        <div class="level-particle" style="left:18%;top:78%;--p-dur:3.2s;--p-del:0s;--p-dy:-85px;--p-dx:-8px"></div>
+        <div class="level-particle" style="left:38%;top:88%;--p-dur:2.7s;--p-del:.5s;--p-dy:-75px;--p-dx:6px"></div>
+        <div class="level-particle" style="left:58%;top:82%;--p-dur:3.4s;--p-del:.9s;--p-dy:-90px;--p-dx:-4px"></div>
+        <div class="level-particle" style="left:78%;top:72%;--p-dur:2.9s;--p-del:1.4s;--p-dy:-70px;--p-dx:10px"></div>
+        <div class="level-particle" style="left:12%;top:62%;--p-dur:3.1s;--p-del:1.8s;--p-dy:-80px;--p-dx:-12px"></div>
+        <div class="level-particle" style="left:48%;top:92%;--p-dur:3.5s;--p-del:2.2s;--p-dy:-95px;--p-dx:3px"></div>
+        <div class="level-particle" style="left:72%;top:68%;--p-dur:2.8s;--p-del:2.6s;--p-dy:-72px;--p-dx:8px"></div>
+        <div class="level-particle" style="left:28%;top:58%;--p-dur:3.3s;--p-del:3s;--p-dy:-65px;--p-dx:-6px"></div>
+      </div>
+      <div id="level-halo"></div>
+      <div id="level-badge"></div>
+    </div>
+  </div>
+  <script src="./renderer.js"></script>
+  <!-- In dev, renderer.ts compiles to renderer.js via tsc -->
+</body>
+</html>

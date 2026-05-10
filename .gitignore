@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.js.map
+*.d.ts.map
+.petdex-cc-backup
+.DS_Store
+Thumbs.db
+*.log
