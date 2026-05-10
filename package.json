@@ -35,5 +35,14 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "files": [
+    "dist/",
+    "src/assets/",
+    "src/hooks/bridge.ps1",
+    "src/hooks/bridge.sh",
+    "README.md",
+    "README_CN.md",
+    "LICENSE"
+  ]
 }
