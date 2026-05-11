@@ -67,7 +67,7 @@ export function createContextMenu(win: BrowserWindow): Electron.Menu {
         dialog.showMessageBox(win, {
           type: "info",
           title: "petdex-cc",
-          message: "petdex-cc v0.1.0",
+          message: "petdex-cc",
           detail:
             "Desktop pet companion for Claude Code.\nPets from https://petdex.crafter.run",
         });

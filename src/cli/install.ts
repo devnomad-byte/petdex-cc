@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -58,7 +58,8 @@ export async function install(slug: string): Promise<void> {
 
   // Header
   console.log("");
-  console.log(`  ${C.magenta}${C.bold}petdex-cc${C.reset} ${C.dim}v0.1.0${C.reset}`);
+  const pkg = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "package.json"), "utf8"));
+  console.log(`  ${C.magenta}${C.bold}petdex-cc${C.reset} ${C.dim}v${pkg.version}${C.reset}`);
   console.log(`  ${C.dim}─────────────────────────────${C.reset}`);
 
   // Step 1: Lookup

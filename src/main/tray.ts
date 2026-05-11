@@ -1,5 +1,6 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readFileSync } from "node:fs";
 import { app, BrowserWindow, Menu, Tray, nativeImage } from "electron";
 
 let tray: Tray | null = null;
@@ -139,7 +140,7 @@ export function createTray(mainWindow: BrowserWindow): Tray | null {
         dialog.showMessageBox({
           type: "info",
           title: "petdex-cc",
-          message: "petdex-cc v0.1.0",
+          message: `petdex-cc v${JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "package.json"), "utf8")).version}`,
           detail:
             "Desktop pet companion for Claude Code.\nPets from https://petdex.crafter.run",
         });

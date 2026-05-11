@@ -1,5 +1,5 @@
 import { join, dirname } from "node:path";
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, ipcMain, Menu, dialog } from "electron";
@@ -155,7 +155,7 @@ async function main() {
           dialog.showMessageBox({
             type: "info",
             title: "petdex-cc",
-            message: "petdex-cc v0.1.0",
+            message: `petdex-cc v${JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "package.json"), "utf8")).version}`,
             detail: "Desktop pet companion for Claude Code.\nPets from https://petdex.crafter.run",
           });
         },
