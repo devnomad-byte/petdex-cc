@@ -27,6 +27,14 @@
 
 <div align="center">
 
+<img src="./boba.gif" alt="petdex-cc demo" width="600" />
+
+</div>
+
+---
+
+<div align="center">
+
 🐾 **One command to bring your pet to life** 🐾
 
 </div>

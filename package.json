@@ -22,7 +22,17 @@
     "petdex",
     "desktop-pet",
     "electron",
-    "hooks"
+    "hooks",
+    "ai-pet",
+    "virtual-pet",
+    "coding-companion",
+    "developer-tools",
+    "tamagotchi",
+    "desktop-mascot",
+    "screen-pet",
+    "claude",
+    "ai-assistant",
+    "cli-tools"
   ],
   "license": "MIT",
   "dependencies": {

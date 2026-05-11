@@ -27,6 +27,14 @@
 
 <div align="center">
 
+<img src="./boba.gif" alt="petdex-cc 演示" width="600" />
+
+</div>
+
+---
+
+<div align="center">
+
 🐾 **一条命令，唤醒你的专属宠物** 🐾
 
 </div>
