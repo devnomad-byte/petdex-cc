@@ -1,11 +1,24 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { homedir } from "node:os";
-import { spawn } from "node:child_process";
+import { spawn, execSync } from "node:child_process";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const PID_FILE = join(homedir(), ".petdex-cc", "data", "pid.lock");
+
+function ensureElectronRemote(): void {
+  try {
+    require.resolve("@electron/remote/main/index.js");
+  } catch {
+    const pkgRoot = dirname(require.resolve("petdex-cc/package.json"));
+    execSync("npm install @electron/remote", {
+      cwd: pkgRoot,
+      stdio: "ignore",
+    });
+  }
+}
 
 export function start(): void {
   if (isRunning()) {
@@ -13,8 +26,10 @@ export function start(): void {
     return;
   }
 
+  ensureElectronRemote();
+
   const electronPath = require("electron");
-  const mainPath = join(import.meta.dirname, "..", "main", "index.js");
+  const mainPath = join(dirname(fileURLToPath(import.meta.url)), "..", "main", "index.js");
   const child = spawn(String(electronPath), [mainPath], {
     detached: true,
     stdio: "ignore",

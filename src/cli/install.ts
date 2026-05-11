@@ -7,7 +7,7 @@ import { findPetBySlug } from "../petdex-api/client.js";
 import { downloadPetAssets } from "../petdex-api/download.js";
 import { registerHooks } from "../hooks/register.js";
 import { writeBridgeScripts } from "../hooks/write-scripts.js";
-import { spawn } from "node:child_process";
+import { spawn, execSync } from "node:child_process";
 import { getDefaultState, saveState } from "../main/storage.js";
 import { stop } from "./stop.js";
 
@@ -123,6 +123,18 @@ export async function install(slug: string): Promise<void> {
 async function startElectron(): Promise<void> {
   const require = createRequire(import.meta.url);
   const __dirname = dirname(fileURLToPath(import.meta.url));
+
+  // Ensure @electron/remote is available (may be missing after global install)
+  try {
+    require.resolve("@electron/remote/main/index.js");
+  } catch {
+    const pkgRoot = dirname(require.resolve("petdex-cc/package.json"));
+    execSync("npm install @electron/remote", {
+      cwd: pkgRoot,
+      stdio: "ignore",
+    });
+  }
+
   const electronPath = require("electron");
   const child = spawn(String(electronPath), [join(__dirname, "..", "main", "index.js")], {
     detached: true,
