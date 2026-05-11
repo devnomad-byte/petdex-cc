@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "tsx src/main/index.ts",
     "dev:renderer": "electron .",
+    "preinstall": "node dist/src/cli/preinstall.js",
     "postinstall": "node dist/src/cli/postinstall.js",
     "build": "tsc && node build-copy.mjs && npx esbuild src/renderer/renderer.ts --bundle --outfile=dist/src/renderer/renderer.js --format=iife --platform=node --external:electron --external:@electron/remote --allow-overwrite",
     "start": "node dist/bin/cli.js start",
