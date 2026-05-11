@@ -455,7 +455,13 @@ petdex-cc reads these from `~/.claude/settings.json` automatically:
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=devnomad-byte/petdex-cc&type=Date)](https://star-history.com/#devnomad-byte/petdex-cc&Date)
+<a href="https://www.star-history.com/?repos=devnomad-byte%2Fpetdex-cc&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=devnomad-byte/petdex-cc&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=devnomad-byte/petdex-cc&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=devnomad-byte/petdex-cc&type=date&legend=top-left" />
+ </picture>
+</a>
 
 <br />
 
