@@ -155,7 +155,7 @@ async function main() {
           dialog.showMessageBox({
             type: "info",
             title: "petdex-cc",
-            message: `petdex-cc v${JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "package.json"), "utf8")).version}`,
+            message: `petdex-cc v${JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "package.json"), "utf8")).version}`,
             detail: "Desktop pet companion for Claude Code.\nPets from https://petdex.crafter.run",
           });
         },

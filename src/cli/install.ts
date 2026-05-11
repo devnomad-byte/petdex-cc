@@ -58,7 +58,7 @@ export async function install(slug: string): Promise<void> {
 
   // Header
   console.log("");
-  const pkg = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "package.json"), "utf8"));
+  const pkg = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "package.json"), "utf8"));
   console.log(`  ${C.magenta}${C.bold}petdex-cc${C.reset} ${C.dim}v${pkg.version}${C.reset}`);
   console.log(`  ${C.dim}─────────────────────────────${C.reset}`);
 

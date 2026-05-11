@@ -1,10 +1,13 @@
 import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
+import { homedir } from "node:os";
+import { join } from "node:path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 /**
  * postinstall script:
  * 1. Print download complete message
- * 2. Auto-detect if user is in China and set ELECTRON_MIRROR for faster downloads
+ * 2. Auto-detect if user is in China and persist ELECTRON_MIRROR to ~/.npmrc
  * 3. Ensure @electron/remote is installed (may be skipped during global install)
  */
 const require = createRequire(import.meta.url);
@@ -18,10 +21,7 @@ const C = {
   green: "\x1b[32m",
 };
 
-const CHINA_MIRRORS = [
-  "https://npmmirror.com/mirrors/electron/",
-  "https://cdn.npmmirror.com/binaries/electron/",
-];
+const ELECTRON_MIRROR_URL = "https://npmmirror.com/mirrors/electron/";
 
 async function main(): Promise<void> {
   // Skip during npm publish / prepublishOnly
@@ -35,11 +35,15 @@ async function main(): Promise<void> {
   await ensureElectronRemote();
 }
 
+/**
+ * Auto-detect China npm registry and persist ELECTRON_MIRROR to ~/.npmrc.
+ * This only runs once — if electron_mirror is already in .npmrc, it's skipped.
+ */
 function ensureElectronMirror(): void {
-  const existing = process.env.ELECTRON_MIRROR;
-  if (existing) return; // User already configured
+  // Already set in env (user did it manually), don't override
+  if (process.env.ELECTRON_MIRROR) return;
 
-  // Simple heuristic: if npm registry is a China mirror, set electron mirror too
+  // Check if npm registry is a China mirror
   const npmRegistry =
     process.env.npm_config_registry || "https://registry.npmjs.org";
   const isChina =
@@ -47,8 +51,23 @@ function ensureElectronMirror(): void {
     npmRegistry.includes("taobao") ||
     npmRegistry.includes("tencent");
 
-  if (isChina) {
-    process.env.ELECTRON_MIRROR = CHINA_MIRRORS[0];
+  if (!isChina) return;
+
+  // Set for current process
+  process.env.ELECTRON_MIRROR = ELECTRON_MIRROR_URL;
+
+  // Persist to ~/.npmrc so future installs also benefit
+  const npmrcPath = join(homedir(), ".npmrc");
+  let npmrc = "";
+  if (existsSync(npmrcPath)) {
+    npmrc = readFileSync(npmrcPath, "utf8");
+  }
+
+  // Only add if not already present
+  if (!npmrc.includes("electron_mirror")) {
+    const line = `electron_mirror=${ELECTRON_MIRROR_URL}\n`;
+    npmrc = npmrc.trimEnd() + "\n" + line;
+    writeFileSync(npmrcPath, npmrc);
   }
 }
 
