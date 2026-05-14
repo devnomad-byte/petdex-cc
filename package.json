@@ -1,6 +1,6 @@
 {
   "name": "petdex-cc",
-  "version": "0.1.11",
+  "version": "0.1.13",
   "description": "Desktop pet companion for Claude Code — animated pets from Petdex that react to your coding in real-time",
   "main": "dist/src/main/index.js",
   "type": "module",

@@ -8,6 +8,7 @@ import { status } from "../src/cli/status.js";
 import { uninstall } from "../src/cli/uninstall.js";
 import { config } from "../src/cli/config.js";
 import { autostart } from "../src/cli/autostart.js";
+import { update } from "../src/cli/update.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -50,6 +51,9 @@ async function main() {
     case "autostart":
       await autostart(rest[0]);
       break;
+    case "update":
+      update();
+      break;
     case "help":
     case "--help":
     case "-h":
@@ -76,6 +80,7 @@ Commands:
   uninstall         Remove petdex-cc hooks and data
   config            Configure API key and settings
   autostart         Enable/disable auto-start on login (--enable / --disable)
+  update            Update petdex-cc to the latest version
   help              Show this help message
 `);
 }

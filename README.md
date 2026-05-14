@@ -308,6 +308,7 @@ petdex-cc stop              # Gracefully stop the pet
 petdex-cc list              # Browse all pets from Petdex registry
 petdex-cc switch <slug>     # Switch pets at runtime (downloads if needed)
 petdex-cc status            # Show pet name, level, events, running status
+petdex-cc update            # Update petdex-cc to the latest version
 petdex-cc uninstall         # Remove hooks, stop pet, delete all data
 petdex-cc autostart         # View auto-start status
 petdex-cc autostart --enable  # Enable auto-start on login (enabled by default on install)
@@ -338,14 +339,14 @@ petdex-cc config --cooldown <minutes>         # AI call cooldown (default: 2)
  ┌─────────────────────────────────────────────────┐
  │                   Claude Code                    │
  │  (tool use, task complete, errors, idle, etc.)   │
- └──────────────────────┬──────────────────────────┘
-                        │ hooks (settings.json)
-                        ▼
-              ┌──────────────────┐
-              │  bridge.ps1/.sh  │  async, 10s timeout
-              └────────┬─────────┘
-                       │ HTTP POST /event
-                       ▼
+ └──────────┬─────────────────────────┬────────────┘
+            │ hooks                   │ statusline
+            ▼                         ▼
+  ┌──────────────────┐    ┌───────────────────────┐
+  │  bridge.ps1/.sh  │    │ statusline-bridge.ps1 │
+  └────────┬─────────┘    └──────────┬────────────┘
+           │ HTTP POST /event        │ HTTP POST /statusline
+           ▼                         ▼
  ┌─────────────────────────────────────────────────┐
  │               petdex-cc (Electron)               │
  │                                                   │
@@ -366,7 +367,8 @@ petdex-cc config --cooldown <minutes>         # AI call cooldown (default: 2)
           │                    │
           │  ┌─── sprite ───┐ │  9 animation states
           │  │   bubble     │ │  3s / 8s auto-dismiss
-          │  │   badge      │ │  Lv tag + color
+          │  │   token badge│ │  real-time token counter
+          │  │   level badge│ │  Lv tag + color
           │  │   effects    │ │  glow/aura/particles/halo
           │  └──────────────┘ │
           └──────────────────┘
