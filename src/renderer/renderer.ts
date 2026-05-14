@@ -73,6 +73,10 @@ function init() {
     updateLevelEffects(state.level);
   });
 
+  ipcRenderer.on("token-update", (_event: Electron.IpcRendererEvent, data: { total_tokens: number; cost_usd: number }) => {
+    updateTokenBadge(data.total_tokens);
+  });
+
   ipcRenderer.send("get-state");
 }
 
@@ -96,6 +100,21 @@ const LEVEL_COLORS: Record<number, string> = {
   1: "#94a3b8", 2: "#4ade80", 3: "#60a5fa", 4: "#a78bfa",
   5: "#f59e0b", 6: "#ec4899", 7: "#06b6d4", 8: "#fbbf24",
 };
+
+function updateTokenBadge(totalTokens: number) {
+  const badge = document.getElementById("token-badge");
+  if (!badge) return;
+  let text: string;
+  if (totalTokens < 1000) {
+    text = `${totalTokens}`;
+  } else if (totalTokens < 1_000_000) {
+    text = `${(totalTokens / 1000).toFixed(1)}K`;
+  } else {
+    text = `${(totalTokens / 1_000_000).toFixed(2)}M`;
+  }
+  badge.textContent = text;
+  badge.style.display = "block";
+}
 
 function updateLevelEffects(level: number) {
   document.documentElement.style.setProperty("--lv-color", LEVEL_COLORS[level] ?? "#94a3b8");

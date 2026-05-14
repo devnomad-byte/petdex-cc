@@ -22,6 +22,7 @@ type HooksMap = Record<string, MatcherGroup[]>;
 
 interface ClaudeSettings {
   hooks?: HooksMap;
+  statusLine?: { type: string; command: string };
   [key: string]: unknown;
 }
 
@@ -112,6 +113,28 @@ export function registerHooks(): void {
   }
 
   fs.writeFileSync(CLAUDE_SETTINGS, JSON.stringify(settings, null, 2), "utf-8");
+
+  // Register statusLine
+  registerStatusLine(settings);
+}
+
+function getStatusLineScriptPath(): string {
+  const home = homedir();
+  if (isWindows()) {
+    return path.join(home, ".petdex-cc", "hooks", "statusline-bridge.ps1");
+  }
+  return path.join(home, ".petdex-cc", "hooks", "statusline-bridge.sh");
+}
+
+const STATUSLINE_MARKER = "petdex-cc-statusline";
+
+function registerStatusLine(settings: ClaudeSettings): void {
+  const scriptPath = getStatusLineScriptPath();
+  settings.statusLine = {
+    type: "command",
+    command: `${scriptPath} # ${STATUSLINE_MARKER}`,
+  };
+  fs.writeFileSync(CLAUDE_SETTINGS, JSON.stringify(settings, null, 2), "utf-8");
 }
 
 export function unregisterHooks(): void {
@@ -149,6 +172,11 @@ export function unregisterHooks(): void {
   // Clean up empty hooks object
   if (Object.keys(settings.hooks).length === 0) {
     delete settings.hooks;
+  }
+
+  // Remove statusLine if it was registered by us
+  if (settings.statusLine?.command?.includes(STATUSLINE_MARKER)) {
+    delete settings.statusLine;
   }
 
   fs.writeFileSync(CLAUDE_SETTINGS, JSON.stringify(settings, null, 2), "utf-8");

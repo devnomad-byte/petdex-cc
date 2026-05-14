@@ -5,9 +5,11 @@ const MAX_PORT_ATTEMPTS = 10;
 
 type EventHandler = (event: Record<string, unknown>) => void;
 type SwitchHandler = (slug: string) => void;
+type TokenHandler = (data: { total_tokens: number; cost_usd: number }) => void;
 
 let eventHandler: EventHandler | null = null;
 let switchHandler: SwitchHandler | null = null;
+let tokenHandler: TokenHandler | null = null;
 let activePort = DEFAULT_PORT;
 
 export function onEvent(handler: EventHandler): void {
@@ -16,6 +18,10 @@ export function onEvent(handler: EventHandler): void {
 
 export function onSwitch(handler: SwitchHandler): void {
   switchHandler = handler;
+}
+
+export function onToken(handler: TokenHandler): void {
+  tokenHandler = handler;
 }
 
 export function getActivePort(): number {
@@ -49,6 +55,20 @@ export function startServer(): Promise<number> {
             try {
               const body = JSON.parse(Buffer.concat(chunks).toString());
               if (switchHandler && body.slug) switchHandler(body.slug);
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end('{"ok":true}');
+            } catch {
+              res.writeHead(400);
+              res.end('{"ok":false,"error":"invalid json"}');
+            }
+          });
+        } else if (req.method === "POST" && req.url === "/statusline") {
+          const chunks: Buffer[] = [];
+          req.on("data", (chunk: Buffer) => chunks.push(chunk));
+          req.on("end", () => {
+            try {
+              const body = JSON.parse(Buffer.concat(chunks).toString());
+              if (tokenHandler) tokenHandler(body);
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end('{"ok":true}');
             } catch {

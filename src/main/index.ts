@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { app, BrowserWindow, ipcMain, Menu, dialog } from "electron";
 // @ts-ignore - @electron/remote provides its own types
 import electronRemote from "@electron/remote/main/index.js";
-import { startServer, getActivePort, onEvent, onSwitch } from "./server.js";
+import { startServer, getActivePort, onEvent, onSwitch, onToken } from "./server.js";
 import { createTray } from "./tray.js";
 import { mapEventToAction } from "./event-mapper.js";
 import { loadState, saveState, incrementEvents, detectLevelUp } from "./storage.js";
@@ -179,6 +179,10 @@ async function main() {
     currentState = { ...currentState, petSlug: slug };
     saveState(currentState);
     mainWindow?.webContents.send("pet-switched", slug);
+  });
+
+  onToken((data) => {
+    mainWindow?.webContents.send("token-update", data);
   });
 
   app.on("window-all-closed", () => {
