@@ -148,4 +148,9 @@ async function startElectron(): Promise<void> {
     stdio: "ignore",
   });
   child.unref();
+
+  // Write pid.lock so `petdex-cc stop` can find the process
+  const dir = join(homedir(), ".petdex-cc", "data");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "pid.lock"), String(child.pid));
 }
