@@ -10,6 +10,7 @@ import { writeBridgeScripts } from "../hooks/write-scripts.js";
 import { spawn, execSync } from "node:child_process";
 import { getDefaultState, saveState } from "../main/storage.js";
 import { stop } from "./stop.js";
+import { enableAutostart } from "./autostart.js";
 
 // ANSI escape codes
 const C = {
@@ -109,7 +110,12 @@ export async function install(slug: string): Promise<void> {
     }
   } catch {}
 
-  // Step 6: Start
+  // Step 6: Auto-start
+  step("Enabling auto-start on login");
+  try { await enableAutostart(); } catch {}
+  stepDone("Auto-start configured");
+
+  // Step 7: Start
   step(`Launching ${pet.displayName}`);
   await startElectron();
   stepDone(`${C.cyan}${pet.displayName}${C.reset} is now on your desktop`);

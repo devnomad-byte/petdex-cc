@@ -40,11 +40,12 @@
 </div>
 
 ```bash
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 <div align="center">
-<i>宠物立刻出现在桌面上，开始响应你的 Claude Code 操作 🎉</i>
+<i>全局安装后，宠物立刻出现在桌面上，开始响应你的 Claude Code 操作 🎉</i>
 </div>
 
 ---
@@ -120,10 +121,15 @@ Byte → Process → Thread → Module → Kernel → Neural → Quantum → Sin
 ```bash
 # 1. 浏览宠物 → https://petdex.crafter.run/zh
 # 2. 看中哪只，记下它的 slug（比如 "boba"）
-# 3. 安装：
+# 3. 全局安装并配置宠物：
 
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
+
+> **为什么要全局安装？** 全局安装后 `petdex-cc` 命令才能在任何终端使用（`petdex-cc start`、`petdex-cc stop` 等）。使用 `npx` 只能一次性安装，新终端窗口中无法直接调用 `petdex-cc` 命令。
+>
+> **开机自启：** `petdex-cc install` 会自动启用开机自启。如需关闭，运行 `petdex-cc autostart --disable`。
 
 ### 🐾 热门宠物
 
@@ -181,8 +187,9 @@ npm config set registry https://registry.npmmirror.com
 # 设置 Electron 下载镜像
 npm config set electron_mirror https://npmmirror.com/mirrors/electron/
 
-# 然后安装
-npx petdex-cc install boba
+# 然后全局安装
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 以上配置永久生效，只需设置一次。
@@ -200,7 +207,8 @@ npx petdex-cc install boba
 
 ```bash
 npm uninstall -g petdex-cc
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 **`EPERM` / `EBUSY` 文件被锁**
@@ -215,7 +223,8 @@ Stop-Process -Name electron -Force -ErrorAction SilentlyContinue
 pkill -f electron
 
 # 然后重新安装
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 **安装时 `ECONNRESET` / `ETIMEDOUT`**
@@ -299,6 +308,9 @@ petdex-cc list              # 浏览 Petdex 宠物库
 petdex-cc switch <slug>     # 运行时切换宠物（自动下载）
 petdex-cc status            # 查看宠物名称、等级、事件数、运行状态
 petdex-cc uninstall         # 移除 hooks、停止宠物、删除所有数据
+petdex-cc autostart         # 查看开机自启状态
+petdex-cc autostart --enable  # 启用开机自启（安装时默认启用）
+petdex-cc autostart --disable # 关闭开机自启
 petdex-cc config [选项]     # 配置设置
 ```
 

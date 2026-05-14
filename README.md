@@ -40,11 +40,12 @@
 </div>
 
 ```bash
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 <div align="center">
-<i>Your pet appears on the desktop and starts reacting to your Claude Code in real-time 🎉</i>
+<i>全局安装后，宠物出现在桌面上，开始实时响应你的 Claude Code 操作 🎉</i>
 </div>
 
 ---
@@ -120,10 +121,15 @@ Level and event count survive restarts (HMAC-signed, tamper-resistant)
 ```bash
 # 1. Browse pets → https://petdex.crafter.run/
 # 2. Find one you like, note the slug (e.g. "boba")
-# 3. Install:
+# 3. Install globally and set up your pet:
 
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
+
+> **Why global install?** `petdex-cc` registers a CLI command so you can run `petdex-cc start`, `petdex-cc stop`, etc. from anywhere. Using `npx` works for one-shot installs but the CLI commands won't be available in new terminal sessions.
+>
+> **Auto-start:** `petdex-cc install` automatically enables auto-start on login. Use `petdex-cc autostart --disable` to turn it off.
 
 ### 🐾 Popular Pets
 
@@ -181,8 +187,9 @@ npm config set registry https://registry.npmmirror.com
 # Set Electron download mirror
 npm config set electron_mirror https://npmmirror.com/mirrors/electron/
 
-# Then install
-npx petdex-cc install boba
+# Then install globally
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 These settings are persistent — you only need to run them once.
@@ -200,7 +207,8 @@ This was a bug in versions before 0.1.6. Update to the latest version:
 
 ```bash
 npm uninstall -g petdex-cc
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 **`EPERM` / `EBUSY` errors**
@@ -215,7 +223,8 @@ Stop-Process -Name electron -Force -ErrorAction SilentlyContinue
 pkill -f electron
 
 # Then reinstall
-npx petdex-cc install boba
+npm install -g petdex-cc
+petdex-cc install boba
 ```
 
 **`ECONNRESET` / `ETIMEDOUT` during install**
@@ -299,6 +308,9 @@ petdex-cc list              # Browse all pets from Petdex registry
 petdex-cc switch <slug>     # Switch pets at runtime (downloads if needed)
 petdex-cc status            # Show pet name, level, events, running status
 petdex-cc uninstall         # Remove hooks, stop pet, delete all data
+petdex-cc autostart         # View auto-start status
+petdex-cc autostart --enable  # Enable auto-start on login (enabled by default on install)
+petdex-cc autostart --disable # Disable auto-start on login
 petdex-cc config [options]  # Configure settings
 ```
 
