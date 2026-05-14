@@ -146,7 +146,7 @@ async function main() {
     const menu = Menu.buildFromTemplate([
       {
         label: mainWindow.isVisible() ? "Hide Pet" : "Show Pet",
-        click: () => mainWindow!.isVisible() ? mainWindow!.hide() : mainWindow!.show(),
+        click: () => mainWindow!.isVisible() ? mainWindow!.hide() : mainWindow!.showInactive(),
       },
       { type: "separator" },
       {

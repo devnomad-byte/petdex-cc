@@ -103,7 +103,7 @@ function updateLevelEffects(level: number) {
   const badge = document.getElementById("level-badge");
   if (badge) {
     badge.textContent = `Lv${level} ${LEVEL_NAMES[level] ?? ""}`;
-    badge.style.display = level >= 2 ? "block" : "none";
+    badge.style.display = "block";
   }
 
   const glow = document.getElementById("level-glow");

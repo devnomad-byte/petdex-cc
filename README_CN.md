@@ -181,18 +181,10 @@ petdex-cc install boba
 首次安装需要下载 Electron 二进制文件（~100MB），默认从 GitHub 下载，国内可能很慢或无法访问。安装前配置国内镜像：
 
 ```bash
-# 设置 npm 淘宝镜像源
-npm config set registry https://registry.npmmirror.com
-
-# 设置 Electron 下载镜像
-npm config set electron_mirror https://npmmirror.com/mirrors/electron/
-
-# 然后全局安装
-npm install -g petdex-cc
+# 全局安装（使用官方 registry 确保获取最新版本）
+npm install -g petdex-cc --registry https://registry.npmjs.org
 petdex-cc install boba
 ```
-
-以上配置永久生效，只需设置一次。
 
 </details>
 
@@ -230,6 +222,15 @@ petdex-cc install boba
 **安装时 `ECONNRESET` / `ETIMEDOUT`**
 
 Electron 无法从 GitHub 下载。请配置国内镜像（见上方「国内用户加速」）。
+
+**`Cannot find module 'auto-launch'`**
+
+npm 镜像源缓存了旧版本，缺少依赖。从官方 registry 安装即可：
+
+```bash
+npm uninstall -g petdex-cc
+npm install -g petdex-cc --registry https://registry.npmjs.org
+```
 
 </details>
 

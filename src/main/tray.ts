@@ -126,7 +126,9 @@ export function createTray(mainWindow: BrowserWindow): Tray | null {
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Show Pet",
-      click: () => mainWindow.show(),
+      click: () => {
+        mainWindow.showInactive();
+      },
     },
     {
       label: "Hide Pet",
@@ -160,7 +162,7 @@ export function createTray(mainWindow: BrowserWindow): Tray | null {
     if (mainWindow.isVisible()) {
       mainWindow.hide();
     } else {
-      mainWindow.show();
+      mainWindow.showInactive();
     }
   });
 

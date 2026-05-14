@@ -181,18 +181,10 @@ petdex-cc install boba
 The first install downloads the Electron binary (~100MB) from GitHub, which can be slow or blocked. Configure npm to use China mirrors before installing:
 
 ```bash
-# Set npm registry to China mirror
-npm config set registry https://registry.npmmirror.com
-
-# Set Electron download mirror
-npm config set electron_mirror https://npmmirror.com/mirrors/electron/
-
-# Then install globally
-npm install -g petdex-cc
+# Install globally (use official registry to ensure latest version)
+npm install -g petdex-cc --registry https://registry.npmjs.org
 petdex-cc install boba
 ```
-
-These settings are persistent — you only need to run them once.
 
 </details>
 
@@ -230,6 +222,15 @@ petdex-cc install boba
 **`ECONNRESET` / `ETIMEDOUT` during install**
 
 Electron cannot download from GitHub. Set the mirror (see "For users in China" above).
+
+**`Cannot find module 'auto-launch'`**
+
+Your npm registry is pointing to a mirror with a cached older version. Install from the official registry:
+
+```bash
+npm uninstall -g petdex-cc
+npm install -g petdex-cc --registry https://registry.npmjs.org
+```
 
 </details>
 

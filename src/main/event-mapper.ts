@@ -35,10 +35,15 @@ export function mapEventToAction(event: Record<string, unknown>): PetAction {
             triggerAi: false,
           };
         case "Edit":
+          return {
+            stateId: "running-right",
+            bubbleText: `Editing ${pathBasename(toolInput?.file_path)}`,
+            triggerAi: false,
+          };
         case "Write":
           return {
-            stateId: "idle",
-            bubbleText: `Edited ${pathBasename(toolInput?.file_path)}`,
+            stateId: "running-left",
+            bubbleText: `Writing ${pathBasename(toolInput?.file_path)}`,
             triggerAi: false,
           };
         case "Bash":
